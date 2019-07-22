@@ -73,7 +73,6 @@ const allPayDates = (date, payDates=[]) => {
         return allPayDates(dateToAdd, R.append(formatDate(dateToAdd), payDates))
     }
 
-
     return payDates
 
 }
@@ -82,6 +81,22 @@ const arrContainsElement = arr => ele => {
     return (arr.indexOf(ele) !== -1)
 }
 
+
+const lensEl = el => R.lensProp(el)
+const lensPayDates = lensEl('payDates')
+
+
+const calculatePayDates = R.over(lensPayDates, allPayDates, payrollOptions)
+
+const calculatedPayDates = R.view(lensPayDates, calculatePayDates)
+
+const doesPayDateExist = arrContainsElement(calculatedPayDates)
+
+const isPayDay = date => {
+    return R.pipe(moment, formatDate, doesPayDateExist)(date)
+}
+
+/*
 const isPayDay = date => {
 
     let payDates = payrollOptions.payDates
@@ -96,6 +111,7 @@ const isPayDay = date => {
     return R.pipe(moment, formatDate, doesDateExist)(date)
 
 } 
+*/
 
 
 const markPayDate = ({date, view}) => {
