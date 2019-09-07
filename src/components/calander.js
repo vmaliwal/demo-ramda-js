@@ -10,7 +10,8 @@ import * as R from 'ramda'
 const payrollOptions = {
     startYear: '2019',
     maxYear: '2030',
-    payDates: []
+    payDates: [],
+    payDay: 4 // THURSDAY
 }
 
 /**
@@ -112,10 +113,11 @@ const allPayDates = (date, payDates=[]) => {
         
         return allPayDates(dateToAdd, R.append(formatDate(dateToAdd), payDates))
     }
-
+    
     return payDates
-
 }
+
+const memoizedPayDates = R.memoizeWith(R.identity, allPayDates)
 
 /**
  * @description A curried function that checks if an element exist inside provided array
@@ -135,7 +137,7 @@ const lensPayDates = R.lensProp('payDates')
 /**
  * @description Setter for pay dates
  */
-const calculatePayDates = R.over(lensPayDates, allPayDates, payrollOptions)
+const calculatePayDates = R.over(lensPayDates, memoizedPayDates, payrollOptions)
 
 /**
  * @description Getter for pay dates array
@@ -149,7 +151,7 @@ const doesPayDateExist = arrContainsElement(calculatedPayDates)
 
 /**
  * @description Checks if provided date is a pay day date
- * @param date - date in string format provided by react-calander 
+ * @param date - date in string format provided by react-calander
  * @returns boolean value if date is a pay date
  */
 const isPayDay = date => {
